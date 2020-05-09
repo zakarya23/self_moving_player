@@ -1,2 +1,2 @@
-# Make_text_neat
-Using C to read commands in order to make changes to text 
+# Self driver 
+Using Linked Lists and Binary Trees in C to make a player that navigates its way through a path. Avoiding blocks. 
