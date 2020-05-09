@@ -1,0 +1,349 @@
+/* Solution to comp10002 Assignment 1, 2019 semester 2.
+
+Authorship Declaration:
+
+(1) I certify that the program contained in this submission is completely
+my own individual work, except where explicitly noted by comments that
+provide details otherwise.  I understand that work that has been developed
+by another student, or by me in collaboration with other students,
+or by non-students as a result of request, solicitation, or payment,
+may not be submitted for assessment in this subject.  I understand that
+submitting for assessment work developed by or in collaboration with
+other students or non-students constitutes Academic Misconduct, and
+may be penalized by mark deductions, or by other penalties determined
+via the University of Melbourne Academic Honesty Policy, as described
+at https://academicintegrity.unimelb.edu.au.
+
+(2) I also certify that I have not provided a copy of this work in either
+softcopy or hardcopy or any other form to any other student, and nor will
+I do so until after the marks are released. I understand that providing
+my work to other students, regardless of my intention or any undertakings
+made to me by that other student, is also Academic Misconduct.
+
+(3) I further understand that providing a copy of the assignment
+specification to any form of code authoring or assignment tutoring
+service, or drawing the attention of others to such services and code
+that may have been made available via such a service, may be regarded
+as Student General Misconduct (interfering with the teaching activities
+of the University and/or inciting others to commit Academic Misconduct).
+I understand that an allegation of Student General Misconduct may arise
+regardless of whether or not I personally make use of such solutions
+or sought benefit from such actions.
+
+Signed by: [Zakarya Ahmed Butt 1086033]
+Dated:     [13th September 2019]
+
+*/
+
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+#define MAX 999 
+#define NEWLINE "\n"
+#define FINISH "\0"
+#define SPACE " "
+#define LINELEN 50  
+
+
+
+
+/*************************************************************************/
+
+/* function prototypes */ 
+
+int mygetchar();
+int read_line(char *line, int maxlen);
+void printspaces();
+int count_chars(char *line,int maxlen);
+int concat_str(int p,int q);
+int maxfor2(char first, char second);
+int maxfor3(char first, char second, char third);
+
+
+/*************************************************************************/
+
+/*main program controls all the actions*/
+
+int
+main(int argc, char *argv[]) {
+	char line[MAX + 1],lastchar,firstchar,command;
+	int index=0,letters=0,linelen=0,newpos,count=0,temppos,disregard=0;
+	int spacelen = 4,maxlinelen,head;
+	
+    maxlinelen = 50;
+    printspaces(spacelen);    /*Prints the spaces for the left margin*/
+  
+    while (read_line(line,MAX)) {
+    	/* While function keeps reading lines */ 
+    	
+    	linelen = count_chars(line,MAX);  /* Gives the number of letters in */ 
+											/* a line */
+
+		if (strlen(line)>0){
+			 /*If line is not empty then go ahead and format it */
+			index=0;			
+			firstchar = line[index];  /* Stores the first character in */
+										/* the line */
+
+			for (index=0;index<linelen;index++) { 
+				
+				
+				if ((firstchar == '.') && (line[index+1] == 'h')) {
+					head = line[3] - '0';
+					if (head == 1) {
+						printf("----------------------------------");
+					}
+				
+				}
+				
+				
+				/* If the 'l' command is present */ 
+			   if ((firstchar == '.') && (line[index+1] == 'l')) {
+			   	   /*If previously new line have been introduced then */
+						/* no more new lines */
+						if (command == 'w') {
+							spacelen = maxfor2(line[3],line[4]);
+							command = 'l';
+							break;
+						}
+						else {
+							printf(NEWLINE);
+							printf(NEWLINE); 
+							letters = 0;
+							printspaces(spacelen);
+							spacelen = maxfor2(line[3],line[4]);
+							command = 'l';
+							break;
+						}
+					}
+				
+				/* If the 'w' command is present */ 
+				
+				else if (line[index] == '.' && line[index+1] == 'w') {
+						/*If previously new line have been introduced then */
+						/* no more new lines */
+						if (command == 'l') {
+							if (strlen(line) == 5) { 
+								/*If num is 2 digit */
+								maxlinelen = maxfor2(line[3],line[4]);
+								command = 'w';
+								break;
+							}
+							else if (strlen(line)==6) {
+								/*If num is 3 digit */
+								maxlinelen = maxfor3(line[3],line[4],line[5]);
+								command = 'w';
+								break;
+							}
+						}
+						else {
+							command = 'w';
+							printf(NEWLINE);
+							printf(NEWLINE); 
+							letters = 0;
+							printspaces(spacelen);
+							
+							if (strlen(line) == 5) {
+								/*If num is 2 digit */
+								maxlinelen = maxfor2(line[3],line[4]);
+								command = 'w';
+								break;
+							}
+							else if (strlen(line)==6) {
+								/*If num is 3 digit */
+								maxlinelen =  maxfor3(line[3],line[4],line[5]);
+								command = 'w';
+								break;
+							}
+					}
+				}
+			
+				/* If the 'p' command is present */ 
+				else if ((firstchar == '.') && (line[index+1] == 'p')) {
+							
+							if (command == 'p') {
+								break;
+							}
+							else {
+								command = 'p';
+								printf(NEWLINE);
+								printf(NEWLINE);
+								printspaces(spacelen);
+								letters = 0;
+								break;
+						}
+					}
+				
+				/* If the 'b' command is present */ 
+				else if ((firstchar == '.') && (line[index+1] == 'b')) {
+						if (command == 'b') {
+								break;
+							}
+						else { 
+							command = 'b';
+							printf(NEWLINE);
+							printspaces(spacelen);
+							letters = 0;
+							break;
+					}
+				}
+					
+					
+					else if ((firstchar == '.') && (line[index+1] == 'c')) {
+						printspaces(15);
+						break;
+					}
+				command = 'a';    /* Random command set as default */
+				newpos=index;
+				for (newpos=index; !isspace(line[newpos]) && (newpos<linelen);
+					newpos++) {
+					count ++;
+				}
+				
+				letters++;   /* For the spaces in line that are not counted*/ 
+				letters = letters + count;
+				
+				if (letters > maxlinelen) {
+					/* If words cross the word limit then newline is */ 
+					/* and then letters reset to the length of word */ 
+					/* that was transferred to new line so it can resume */ 
+					
+						printf(NEWLINE); 
+						letters = count;
+						printspaces(spacelen);
+						
+						/* If word did cross the limit so this loop prints*/ 
+						/* that word out after the new line and spaces have */ 
+						/* been placed  */
+						
+						for (temppos=index;temppos<newpos;temppos++,index++) {
+							printf("%c",line[temppos]);
+						}
+						
+						printf(SPACE);
+						count = 0;
+					}
+				else {
+					/* If the word didnt cross the limit then it just */ 
+					/* regularly prints it out */ 
+					for (temppos=index;temppos<newpos;temppos++,index++) {
+						printf("%c",line[temppos]);
+					}
+					printf(SPACE);
+					count = 0;
+				}		
+		 } 
+		 lastchar = (line[index-2]);   /* Stores the last character in the */
+		 								/* line */
+	
+		 if ((!isspace(lastchar)) && (strlen(line)>0) && (!isspace(firstchar))) {
+		 	 disregard++;
+		   }
+		}	
+    }	
+    printf("\n");
+		
+	return 0; 
+}
+
+/***********************************************************************/
+
+
+int
+mygetchar() {
+	int c;
+	while ((c=getchar())=='\r') {
+	}
+	return c;
+}
+
+/***********************************************************************/
+
+/* read a line of input into the array passed as argument
+* returns false if there is no input available
+* all whitespace characters are removed
+*/
+
+int
+read_line(char *line, int maxlen) {
+	int i=0, c,extraspace=0;
+	while (((c=mygetchar())!=EOF) && (c!='\n')) {		
+		 if (i<maxlen && !isspace(c)) {
+			line[i] = c;
+			i++; 	
+			
+		}
+		
+		else if (isspace(c) && isspace(line[i-1]) ) {
+			extraspace ++;
+		}
+		else if ((isspace(c)) && (!isspace(line[i-1])) && (i>0) ) {
+			line[i] = ' ';
+			i++;
+		}	
+	}	
+	line[i] = '\0';
+	return ((i>0) || (c!=EOF));
+}
+
+
+/*********************************************************************/
+
+/*Prints the required amount of spaces at the start of each line*/
+void 
+printspaces(int count) {
+	int space=0;
+	while (space<count) {
+		printf(" ");
+		space++;
+	}
+	space = 0;
+}
+
+
+/*********************************************************************/
+
+/*Counts the number of letters of a word*/
+int 
+count_chars(char *line,int maxlen) {
+	int i,letters=0;
+	for (i=0;(line[i])!='\0';i++) {
+		letters++;
+	
+	}
+	return letters;
+}
+
+/*********************************************************************/
+
+/* Takes 2 char as input and converts them to int and then prints out */ 
+/* the new max value */
+
+int 
+maxfor2(char first, char second) {
+	int num1,num2; 
+	num1 = first - '0'; 
+	num2 = second - '0'; 
+	
+	return ((num1*10) +num2);
+}
+
+
+/**********************************************************************/
+
+/* Takes 3 char as input and converts them to int and then prints out */ 
+/* the new max value */
+int 
+maxfor3(char first, char second, char third) {
+	int num1,num2,num3; 
+	
+	num1 = first - '0'; 
+	num2 = second - '0'; 
+	num3 = third - '0';
+	
+	return ((100*num1) + (10*num2) + num3);
+
+}
